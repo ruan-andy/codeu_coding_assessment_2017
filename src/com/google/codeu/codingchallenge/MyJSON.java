@@ -16,39 +16,74 @@ package com.google.codeu.codingchallenge;
 
 import java.util.Collection;
 
+import java.util.*;
+
 final class MyJSON implements JSON {
+  // Hashmap using Linkedlist to hold the JSON with mutiple JSON as value
+  private static HashMap<String, LinkedList<JSON>> objMap;
+
+  // Hashmap to to hold JSON with String as values
+  private static HashMap<String, String>  strMap;
+
+  private String key;
+  private String value;
+  private LinkedList<MyJSON> object;
+
+  // Empty constructor for setting up the hashmaps
+  public class MyJSON() {
+    objMap = new HashMap<String, LinkedList<JSON>>();
+    strMap = new HashMap<String, String>();
+  }
+
+  // constructor for making string value JSON
+  public class MyJSON(String key, String value) {
+    this.key = key;
+    this.value = value;
+    this.object = null;
+  }
+
+  //constructor for making linkedlist value hashmaps
+  public class MyJSON(String key, LinkedList<MyJSON> object) {
+    this.key = key;
+    this.value = null;
+    this.object = object;
+  }
 
   @Override
   public JSON getObject(String name) {
-    // TODO: implement this
-    return null;
+    return objMap.get(name);
   }
 
   @Override
   public JSON setObject(String name, JSON value) {
-    // TODO: implement this
+    objMap.put(name, value);
     return this;
   }
 
   @Override
   public String getString(String name) {
-    // TODO: implement this
-    return null;
+    return strMap.get(name);
   }
 
   @Override
   public JSON setString(String name, String value) {
-    // TODO: implement this
+    strMap.put(name, value);
     return this;
   }
 
   @Override
   public void getObjects(Collection<String> names) {
-    // TODO: implement this
+    Set<String> keys = objMap.keySet();
+    for (String i: keys) {
+      names.add(keys)
+    }
   }
 
   @Override
   public void getStrings(Collection<String> names) {
-    // TODO: implement this
+    Set<String> keys = strMap.keySet();
+    for (String i: keys) {
+      names.add(keys)
+    }
   }
 }
