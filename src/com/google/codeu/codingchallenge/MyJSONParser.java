@@ -29,8 +29,8 @@ final class MyJSONParser implements JSONParser {
     String tmpString = "";
 
     //LinkedList for storing values to check if it is more than one
-    LinkedList tmpValues<JSON> = new LinkedList<JSON>();
-    // Stack for operatorss/not letters to check for syntax
+    LinkedList<String> tmpValues = new LinkedList<String>();
+    // Stack for operator's/not letters to check for syntax
     Stack operators = new Stack();
 
     Stack tmpKeys = new Stack();
@@ -43,14 +43,14 @@ final class MyJSONParser implements JSONParser {
     for (int i = 0; i < in.length(); i++) {
       char curChar = in.charAt(i);
 
-      if (curChar.equals('{') ) {
+      if (curChar == '{' ) {
         objectStart = true;
         operators.push(curChar);
 
-      } else if(curChar.equals('\\') ) {
+      } else if(curChar == '\\' ) {
         operators.push(curChar);
 
-      } else if(curChar.equals('\"') ) {
+      } else if(curChar == '\"' ) {
         if (!operators.peek().equals('\\')) {
           throw new IOException();
         }
@@ -60,23 +60,23 @@ final class MyJSONParser implements JSONParser {
         if (objectStart) {
           tmpKeys.push(tmpString);
         } else {
-          myJson.setString(tmpKeys.pop(), tmpString);
+          myJson.setString((String) tmpKeys.pop(), tmpString);
         }
         if (!startString) {
           tmpString = "";
-          !startString;
+          startString = !startString;
         }
-      } else if(curChar.equals(':') ) {
+      } else if(curChar == ':' ) {
         if (!startString) {
           throw new IOException();
         }
-        tmpKeys.push();
+        tmpKeys.push(tmpString);
         keyValue = true;
-      } else if(curChar.equals(',') ) {
-        tmpValues.add(new MyJSON(tmpString));
+      } else if(curChar == ',' ) {
+        tmpValues.add(tmpString);
         keyValue = false;
-      } else if(curChar.isLetter() || curChar.isDigit() ) {
-        if (operators.peek().equals('\\') && (curChar.equals('t') || curChar.equals('n')) ) {
+      } else if(Character.isLetter(curChar) || Character.isDigit(curChar) ) {
+        if (operators.peek().equals('\\') && (curChar == 't' || curChar == 'n') ) {
           tmpString += operators.pop();
         }
 

@@ -20,7 +20,7 @@ import java.util.*;
 
 final class MyJSON implements JSON {
   // Hashmap using Linkedlist to hold the JSON with mutiple JSON as value
-  private static HashMap<String, LinkedList<JSON>> objMap;
+  private static HashMap<String, JSON> objMap;
 
   // Hashmap to to hold JSON with String as values
   private static HashMap<String, String>  strMap;
@@ -30,20 +30,20 @@ final class MyJSON implements JSON {
   private LinkedList<MyJSON> object;
 
   // Empty constructor for setting up the hashmaps
-  public class MyJSON() {
-    objMap = new HashMap<String, LinkedList<JSON>>();
+  public MyJSON() {
+    objMap = new HashMap<String, JSON>();
     strMap = new HashMap<String, String>();
   }
 
   // constructor for making string value JSON
-  public class MyJSON(String key, String value) {
+  public MyJSON(String key, String value) {
     this.key = key;
     this.value = value;
     this.object = null;
   }
 
   //constructor for making linkedlist value hashmaps
-  public class MyJSON(String key, LinkedList<MyJSON> object) {
+  public MyJSON(String key, LinkedList<MyJSON> object) {
     this.key = key;
     this.value = null;
     this.object = object;
@@ -75,7 +75,7 @@ final class MyJSON implements JSON {
   public void getObjects(Collection<String> names) {
     Set<String> keys = objMap.keySet();
     for (String i: keys) {
-      names.add(keys)
+      names.add(i);
     }
   }
 
@@ -83,7 +83,7 @@ final class MyJSON implements JSON {
   public void getStrings(Collection<String> names) {
     Set<String> keys = strMap.keySet();
     for (String i: keys) {
-      names.add(keys)
+      names.add(i);
     }
   }
 }
