@@ -27,13 +27,14 @@ final class MyJSONParser implements JSONParser {
     String tmpKey = "";
     String tmpValue = "";
     String tmpString = "";
+    JSON tmpJSON = null;
 
     //LinkedList for storing values to check if it is more than one
-    LinkedList<String> tmpValues = new LinkedList<String>();
+    LinkedList<JSON> tmpValues = new LinkedList<JSON>();
     // Stack for operator's/not letters to check for syntax
-    Stack<Character> operators = new Stack();
+    Stack<Character> operators = new Stack<Character>();
 
-    Stack<String> tmpKeys = new Stack();
+    Stack<String> tmpKeys = new Stack<String>();
     //boolean variables for syntax checking
     boolean objectStart = true;
     boolean isObject = false;
@@ -42,29 +43,48 @@ final class MyJSONParser implements JSONParser {
 
     for (int i = 0; i < in.length(); i++) {
       char curChar = in.charAt(i);
-
       if (curChar == '{' ) {
         objectStart = true;
         operators.push(curChar);
 
       } else if(curChar == '}' ) {
-        if (operators.peek().equals('{')) {
+        if (!operators.isEmpty() && operators.peek().equals('{')) {
           operators.pop();
-          if (tmpValues.size() == 1) {
-            myJson.setString(tmpKeys.pop(), tmpValues.get(0));
-          }
+          isObject = false;
         } else {
           throw new IOException("Missing { for }");
         }
-      } else if(curChar == '\\' ) {
-        operators.push(curChar);
-
       } else if(curChar == '\"' ) {
-        if (!operators.peek().equals('\\')) {
+        if (!operators.isEmpty()) {
+          if (operators.peek().equals('\"')) {
+            operators.pop();
+            startString = !startString;
+          } else {
+            operators.push(curChar);
+            startString = !startString;
+          }
+        } else {
+          if (!startString) {
+            operators.push(curChar);
+            startString = !startString;
+          } else {
+            throw new IOException("Missing \"");
+          }
+
+        }
+        /*
+        if (operators.isEmpty() ||  !operators.peek().equals('\\') ) {
+          if(!operators.isEmpty()) {
+            String hi = operators.pop() + tmpString;
+            throw new IOException(hi);
+          }
           throw new IOException("Missing \\ before \"");
         }
+        //&& !operators.peek().equals('\\')
         operators.pop();
         startString = !startString;
+        */
+
         /*
         if (objectStart) {
           tmpKeys.push(tmpString);
@@ -75,28 +95,58 @@ final class MyJSONParser implements JSONParser {
           tmpString = "";
           startString = !startString;
         }*/
+
+        /*
         if (!startString && !keyValue) {
           tmpValues.add(tmpString);
+          tmpString = "";
+        }*/
+
+        if (!tmpKeys.isEmpty() && !startString && !keyValue && isObject) {
+          System.out.println(!startString);
+          System.out.println(!tmpKeys.isEmpty());
+          System.out.println(tmpString);
+          tmpJSON = new MyJSON(tmpKeys.pop(), tmpString);
+          System.out.println(tmpString);
+          //myJson.setString(tmpKeys.pop(), tmpString);
+          tmpString = "";
         }
+
       } else if(curChar == ':' ) {
-        if (!startString) {
+        if (startString) {
           throw new IOException("String did not end");
         }
         tmpKeys.push(tmpString);
+        tmpString = "";
         keyValue = false;
+        isObject = true;
       } else if(curChar == ',' ) {
-        tmpValues.add(tmpString);
-        keyValue = false;
-      } else if(Character.isLetter(curChar) || Character.isDigit(curChar) || curChar == ' ') {
-        if (operators.peek().equals('\\') && (curChar == 't' || curChar == 'n') ) {
+        tmpValues.add(tmpJSON);
+        keyValue = true;
+
+      } else if(startString && (Character.isLetter(curChar) || Character.isDigit(curChar) || curChar == ' ') ) {
+        /*
+        if (!operators.isEmpty() && operators.peek().equals('\\') && (curChar == 't' || curChar == 'n') ) {
           tmpString += operators.pop();
-        }
+        }*/
 
         tmpString += curChar;
       }
+
+      //System.out.println(tmpString);
+      //System.out.println(curChar);
+      //System.out.println(startString);
     }
-    if (!tmpKeys.empty() || !operators.empty()) {
-      throw new IOException("Unleft closing");
+
+    System.out.println(!startString);
+    System.out.println(!tmpKeys.isEmpty());
+    System.out.println(keyValue);
+    System.out.println(isObject);
+    System.out.println(tmpString);
+
+    //System.out.println(myJson.getString("name"));
+    if (!tmpKeys.isEmpty() || !operators.isEmpty()) {
+      //throw new IOException("Unfinished");
     }
     return myJson;
   }
