@@ -47,6 +47,12 @@ final class MyJSONParser implements JSONParser {
         objectStart = true;
         operators.push(curChar);
 
+      } else if(curChar == '}' ) {
+        if (operators.peek().equals('{')) {
+          operators.pop();
+        } else {
+          throw new IOException();
+        }
       } else if(curChar == '\\' ) {
         operators.push(curChar);
 
