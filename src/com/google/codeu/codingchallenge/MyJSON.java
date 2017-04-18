@@ -25,6 +25,7 @@ final class MyJSON implements JSON {
   // Hashmap to to hold JSON with String as values
   private static HashMap<String, String>  strMap;
 
+  // MyJSON variables
   private String key;
   private String value;
   private LinkedList<MyJSON> object;
@@ -40,6 +41,7 @@ final class MyJSON implements JSON {
     this.key = key;
     this.value = value;
     this.object = null;
+    setString(key, value);
   }
 
   //constructor for making linkedlist value hashmaps
@@ -47,33 +49,45 @@ final class MyJSON implements JSON {
     this.key = key;
     this.value = null;
     this.object = object;
+    setObject(key, new MyJSON(object) );
+  }
+
+  //constructor for turning list MYJSON to MYJSON objects
+  public MyJSON(LinkedList<MyJSON> object) {
+    this.object = object;
   }
 
   @Override
   public JSON getObject(String name) {
+    // get from the hashmap
     return objMap.get(name);
   }
 
   @Override
   public JSON setObject(String name, JSON value) {
+    // set from hashmaps and if it is not there, it will create new
     objMap.put(name, value);
     return this;
   }
 
   @Override
   public String getString(String name) {
+    // get from strings only hashmaps
     return strMap.get(name);
   }
 
   @Override
   public JSON setString(String name, String value) {
+    // set from strings hash map, if key not available, create new
     strMap.put(name, value);
     return this;
   }
 
   @Override
   public void getObjects(Collection<String> names) {
+    // get all the keys from the object hash map
     Set<String> keys = objMap.keySet();
+    // add them to the collection of names
     for (String i: keys) {
       names.add(i);
     }
@@ -81,7 +95,9 @@ final class MyJSON implements JSON {
 
   @Override
   public void getStrings(Collection<String> names) {
+    // get all the keys from the string hashmap
     Set<String> keys = strMap.keySet();
+    //add the keys to the names collection
     for (String i: keys) {
       names.add(i);
     }
