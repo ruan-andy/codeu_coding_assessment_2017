@@ -66,6 +66,7 @@ final class TestMain {
       }
     });
 
+
     tests.run(new JSONFactory(){
       @Override
       public JSONParser parser() {
