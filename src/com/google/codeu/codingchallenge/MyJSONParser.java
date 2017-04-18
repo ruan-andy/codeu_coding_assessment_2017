@@ -31,14 +31,14 @@ final class MyJSONParser implements JSONParser {
     //LinkedList for storing values to check if it is more than one
     LinkedList<String> tmpValues = new LinkedList<String>();
     // Stack for operator's/not letters to check for syntax
-    Stack operators = new Stack();
+    Stack<Character> operators = new Stack();
 
-    Stack tmpKeys = new Stack();
+    Stack<String> tmpKeys = new Stack();
     //boolean variables for syntax checking
     boolean objectStart = true;
     boolean isObject = false;
     boolean startString = false;
-    boolean keyValue = false;
+    boolean keyValue = true;
 
     for (int i = 0; i < in.length(); i++) {
       char curChar = in.charAt(i);
@@ -50,19 +50,22 @@ final class MyJSONParser implements JSONParser {
       } else if(curChar == '}' ) {
         if (operators.peek().equals('{')) {
           operators.pop();
+          if (tmpValues.size() == 1) {
+            myJson.setString(tmpKeys.pop(), tmpValues.get(0));
+          }
         } else {
-          throw new IOException();
+          throw new IOException("Missing { for }");
         }
       } else if(curChar == '\\' ) {
         operators.push(curChar);
 
       } else if(curChar == '\"' ) {
         if (!operators.peek().equals('\\')) {
-          throw new IOException();
+          throw new IOException("Missing \\ before \"");
         }
         operators.pop();
         startString = !startString;
-
+        /*
         if (objectStart) {
           tmpKeys.push(tmpString);
         } else {
@@ -71,17 +74,20 @@ final class MyJSONParser implements JSONParser {
         if (!startString) {
           tmpString = "";
           startString = !startString;
+        }*/
+        if (!startString && !keyValue) {
+          tmpValues.add(tmpString);
         }
       } else if(curChar == ':' ) {
         if (!startString) {
-          throw new IOException();
+          throw new IOException("String did not end");
         }
         tmpKeys.push(tmpString);
-        keyValue = true;
+        keyValue = false;
       } else if(curChar == ',' ) {
         tmpValues.add(tmpString);
         keyValue = false;
-      } else if(Character.isLetter(curChar) || Character.isDigit(curChar) ) {
+      } else if(Character.isLetter(curChar) || Character.isDigit(curChar) || curChar == ' ') {
         if (operators.peek().equals('\\') && (curChar == 't' || curChar == 'n') ) {
           tmpString += operators.pop();
         }
@@ -90,7 +96,7 @@ final class MyJSONParser implements JSONParser {
       }
     }
     if (!tmpKeys.empty() || !operators.empty()) {
-      throw new IOException();
+      throw new IOException("Unleft closing");
     }
     return myJson;
   }
